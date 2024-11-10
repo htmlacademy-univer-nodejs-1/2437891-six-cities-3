@@ -1,0 +1,72 @@
+{
+  "api": {
+    "titles": [
+      "the_first_house",
+      "the_second_house",
+      "the_third_house",
+      "the_fourth_house",
+      "the_fifth_house",
+      "the_sixth_house"
+    ],
+    "descriptions": [
+      "the_first_long_full_description",
+      "the_second_long_full_description",
+      "the_third_long_full_description",
+      "the_fourth_long_full_description",
+      "the_fifth_long_full_description",
+      "the_sixth_long_full_description"
+    ],
+    "cities": [
+      "Paris",
+      "Cologne",
+      "Brussels",
+      "Amsterdam",
+      "Hamburg",
+      "Dusseldorf"
+    ],
+    "previewImages": [
+      "preview1.jpg",
+      "preview2.jpg",
+      "preview3.jpg",
+      "preview4.jpg",
+      "preview5.jpg",
+      "preview6.jpg"
+    ],
+    "images": [
+      "apartment-01.jpg",
+      "apartment-02.jpg",
+      "apartment-03.jpg",
+      "apartment-04.jpg",
+      "apartment-05.jpg",
+      "apartment-06.jpg",
+      "apartment-07.jpg",
+      "apartment-08.jpg",
+      "apartment-09.jpg",
+      "apartment-10.jpg"
+    ],
+    "conveniences": [
+      "Breakfast",
+      "Air conditioning",
+      "Laptop friendly workspace",
+      "Baby seat",
+      "Washer",
+      "Towels",
+      "Fridge"
+    ],
+    "users": [
+      "user_name1 email1@gmail.com password1_salt!@# Standart avatar_path1.jpg",
+      "user_name2 email2@gmail.com password2_salt!@# Standart avatar_path2.jpg",
+      "user_name3 email3@gmail.com password3_salt!@# Standart avatar_path3.jpg",
+      "user_name4 email4@gmail.com password4_salt!@# Standart avatar_path4.jpg",
+      "user_name5 email5@gmail.com password5_salt!@# Pro avatar_path5.jpg"
+    ],
+    "coordinates": [
+      "48.85661 2.351499",
+      "50.938361 6.959974",
+      "50.846557 4.351697",
+      "52.370216 4.895168",
+      "53.550341 10.000654",
+      "51.225402 6.776314"
+    ]
+  }
+}

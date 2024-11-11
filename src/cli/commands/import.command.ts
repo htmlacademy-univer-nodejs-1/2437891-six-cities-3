@@ -3,6 +3,7 @@ import { createOffer } from '../../shared/helpers/rent-offer.js';
 import { TSVFileReader } from '../../shared/libs/file-reader/tsv-file-reader.js';
 import { Command } from './command.interface.js';
 
+// TODO: update (HW4)
 export class ImportCommand implements Command {
   public getName(): string {
     return '--import';

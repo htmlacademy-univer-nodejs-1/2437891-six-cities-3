@@ -1,0 +1,624 @@
+openapi: 3.0.3
+info:
+  title: API сервер для проекта «Шесть городов».
+  description: API сервер для проекта «Шесть городов».
+  version: 1.0.0
+tags:
+  - name: offers
+    description: Предожения
+  - name: comments
+    description: Комментарии
+  - name: users
+    description: Пользователи
+
+paths:
+  /offers:
+    post:
+      tags:
+        - offers
+      summary: Создание предложения
+      description: Создание нового предложения
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/createOffer'
+        required: true
+      responses:
+        200:
+          description: Новое предложения создано
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/offer'
+        400:
+          description: Введенные данные не прошли валидацию
+        401:
+          description: Пользователь не авторизован
+
+    put:
+      tags:
+        - offers
+      summary: Редактирование предложения
+      description: Редактирование существующего предложения
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/updateOffer'
+        required: true
+      responses:
+        200:
+          description: Предложение успешно отредактировано
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/offer'
+        400:
+          description: Введенные данные не прошли валидацию
+        401:
+          description: Пользователь не авторизован
+        403:
+          description: Редактирование данного предложения недоступно
+        404:
+          description: Предложение не найдено
+
+    delete:
+      tags:
+        - offers
+      summary: Удаление предложения по аренде
+      description: Удаление существующего объявления
+      responses:
+        200:
+          description: Предложение успешно удалено
+        401:
+          description: Пользователь не авторизован
+        403:
+          description: Удаление данного предложения недоступно
+
+    get:
+      parameters:
+        - name: count
+          in: query
+          description: Количество запрашиваемых предложений (Опционально)
+          required: false
+          schema:
+            type: integer
+      tags:
+        - offers
+      summary: Список предложений по аренде
+      responses:
+        200:
+          description: Успешно получен список предложений
+          content:
+            application/json:
+              schema:
+                type: array
+                $ref: '#/components/schemas/offerShort'
+
+  /offers/{offerId}:
+    get:
+      tags:
+        - offers
+      summary: Детальная информация по предложению
+      responses:
+        200:
+          description: Детальная информация по предложению успешно получена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/offer'
+
+  /comments:
+    get:
+      tags:
+        - comments
+      summary: Список комментариев для предложения
+      responses:
+        200:
+          description: Список комментариев для объявления успешно получен. Если пользователь не вводил количество комментариев, то по умолчанию выводится 50.
+          content:
+            application/json:
+              schema:
+                type: array
+                $ref: '#/components/schemas/offer'
+    
+    post:
+      tags:
+        - comments
+      summary: Добавление комментария
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/createComment'
+        required: true
+      responses:
+        200:
+          description: Успешное добавление комментария
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/comment'
+        400:
+          description: Введенные данные не прошли валидацию
+        401:
+          description: Пользователь не авторизован
+
+  /users:
+    post:
+      tags:
+        - users
+      summary: Создание нового пользователя
+      requestBody:
+        description: Информация для создания нового пользователя.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/createUser'
+        required: true
+
+      responses:
+        200:
+          description: Успешное создание нового пользователя
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user'
+        400:
+          description: Введенные данные не прошли валидацию
+        401:
+          description: Пользователь не авторизован
+        409:
+          description: Пользователь с таким email уже существует
+
+    get:
+      tags:
+        - users
+      summary: Проверка состояния пользователя
+      description: Возвращает информацию по авторизованному пользователю
+      responses:
+        200:
+          description: Успешная проверка
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user'
+        401:
+          description: Пользователь не авторизован
+
+  /users/login:
+    post:
+      tags:
+        - users
+      summary: Вход в закрытую часть приложения
+      description: Авторизует пользователя на основе логина и пароля
+      responses:
+        200:
+          description: Успешная авторизация
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/userLogin'
+        400:
+          description: Некорректная валидация
+
+  /users/logout:
+    get:
+      tags:
+        - users
+      summary: Выход из закрытой части приложения (только если авторизация выполняется на основе сессий)
+      responses:
+        200:
+          description: Успешный выход
+        401:
+          description: Пользователь не авторизован
+
+  /offers/premium:
+    get:
+      tags:
+        - offers
+      summary: Премиальные предложения для города
+      responses:
+        200:
+          description: Возвращает не более 3 премиальных предложения
+          content:
+            application/json:
+              schema:
+                type: array
+                $ref: '#/components/schemas/offerShort'
+
+  /offers/favorite:
+    get:
+      tags:
+        - offers
+      summary: Список избранных предложений
+      responses:
+        200:
+          description: Возвращает список избранных предложений
+          content:
+            application/json:
+              schema:
+                type: array
+                $ref: '#/components/schemas/offerShort'
+        401:
+          description: Пользователь не авторизован
+    
+    patch:
+      tags:
+        - offers
+      summary: Обновление флага "В избранном"
+      requestBody:
+        description: Обновление флага "В избранном"
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/setOfferFavorite'
+        required: true
+      responses:
+        200:
+          description: Обновление прошло успешно
+        401:
+          description: Пользователь не авторизован
+
+components:
+  schemas:
+    createUser:
+      type: object
+
+      properties:
+        email:
+          type: string
+          example: "keks@htmlacademy.ru"
+
+        name:
+          type: string
+          example: 'Иван Петров'
+
+        password:
+          type: string
+          example: "123456"
+
+        avatar?:
+          type: string
+          example: 'studio-01.jpg'
+
+        useType:
+          type: string
+          example: 'pro'
+
+    user:
+      type: object
+
+      properties:
+        id:
+          type: string
+          example: "6329c3d6a04ab1061c6425ea"
+
+        email:
+          type: string
+          example: "keks@htmlacademy.ru"
+
+        name:
+          type: string
+          example: 'Иван Петров'
+
+        avatar?:
+          type: string
+          example: 'studio-01.jpg'
+
+        useType:
+          type: string
+          example: 'pro'
+    
+    userLogin:
+      type: object
+
+      properties:
+        token:
+          type: string
+
+    createOffer:
+      type: object
+      properties:
+        name:
+          type: string
+          example:  'Ключ к успеху'
+
+        description:
+          type: string
+          example: 'Мы предлагаем квартиры и дома в лучших районах города, чтобы вы могли наслаждаться комфортом и уютом своего нового дома.'
+
+        date:
+          type: string
+          format: date
+          example: '2023.04.09'
+
+        city:
+          type: string
+          example: 'Paris'
+
+        previewImage:
+          type: string
+          example: 'studio-photos.jpg'
+
+        images:
+          type: array
+          items:
+            type: string
+          example: [ 'apartment-01.jpg','apartment-02.jpg']
+
+        isPremium:
+          type: boolean
+
+        isFavourites:
+          type: boolean
+
+        rating:
+          type: number
+          example: 5
+
+        type:
+          type: string
+          example: 'House'
+
+        roomCount:
+          type: number
+          example: 2
+
+        guestCount:
+          type: number
+          example: 2
+
+        rentPrice:
+          type: number
+          example: 10000
+
+        conveniences:
+          type: string
+          example: 'Breakfast'
+
+        authorId:
+          type: string
+          example: '6329c3d6a04ab1061c6425ea'
+
+        coordinates:
+          type: string
+          example: 'latitude: 48.85661, longitude: 2.351499'
+    
+    updateOffer:
+      type: object
+      properties:
+        name:
+          type: string
+          example:  'Ключ к успеху'
+
+        description:
+          type: string
+          example: 'Мы предлагаем квартиры и дома в лучших районах города, чтобы вы могли наслаждаться комфортом и уютом своего нового дома.'
+
+        date:
+          type: string
+          format: date
+          example: '2023.04.09'
+
+        city:
+          type: string
+          example: 'Paris'
+
+        previewImage:
+          type: string
+          example: 'studio-photos.jpg'
+
+        images:
+          type: array
+          items:
+            type: string
+          example: [ 'apartment-01.jpg','apartment-02.jpg']
+
+        isPremium:
+          type: boolean
+
+        isFavourites:
+          type: boolean
+
+        rating:
+          type: number
+          example: 5
+
+        type:
+          type: string
+          example: 'House'
+
+        roomCount:
+          type: number
+          example: 2
+
+        guestCount:
+          type: number
+          example: 2
+
+        rentPrice:
+          type: number
+          example: 10000
+
+        conveniences:
+          type: string
+          example: 'Breakfast'
+
+        authorId:
+          type: string
+          example: '6329c3d6a04ab1061c6425ea'
+
+        coordinates:
+          type: string
+          example: 'latitude: 48.85661, longitude: 2.351499'
+    
+    offer:
+      type: object
+      properties:
+        id:
+          type: string
+          example: '6329c3d6a04ab1061c6425ea'
+
+        name:
+          type: string
+          example:  'Ключ к успеху'
+
+        description:
+          type: string
+          example: 'Мы предлагаем квартиры и дома в лучших районах города, чтобы вы могли наслаждаться комфортом и уютом своего нового дома.'
+
+        date:
+          type: string
+          format: date
+          example: '2023.04.09'
+
+        city:
+          type: string
+          example: 'Paris'
+
+        previewImage:
+          type: string
+          example: 'studio-photos.jpg'
+
+        images:
+          type: array
+          items:
+            type: string
+          example: [ 'apartment-01.jpg','apartment-02.jpg']
+
+        isPremium:
+          type: boolean
+
+        isFavourites:
+          type: boolean
+
+        rating:
+          type: number
+          example: 5
+
+        type:
+          type: string
+          example: 'House'
+
+        roomCount:
+          type: number
+          example: 2
+
+        guestCount:
+          type: number
+          example: 2
+
+        rentPrice:
+          type: number
+          example: 10000
+
+        conveniences:
+          type: string
+          example: 'Breakfast'
+
+        author:
+          type: object
+          $ref: '#/components/schemas/user'
+
+        coordinates:
+          type: string
+          example: 'latitude: 48.85661, longitude: 2.351499'
+        
+        commentsCount:
+          type: number
+          example: 0
+    
+    offerShort:
+      type: object
+      properties:
+        id:
+          type: string
+          example: '6329c3d6a04ab1061c6425ea'
+
+        name:
+          type: string
+          example:  'Ключ к успеху'
+
+        date:
+          type: string
+          format: date
+          example: '2023.04.09'
+
+        city:
+          type: string
+          example: 'Paris'
+
+        previewImage:
+          type: string
+          example: 'studio-photos.jpg'
+
+        isPremium:
+          type: boolean
+
+        isFavourites:
+          type: boolean
+
+        rating:
+          type: number
+          example: 5
+
+        type:
+          type: string
+          example: 'House'
+
+        rentPrice:
+          type: number
+          example: 10000
+
+        commentsCount:
+          type: number
+          example: 0
+
+    comment:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "6329c3d6a04ab1061c6425ea"
+        text:
+          type: string
+          example: 'Супер'
+        date:
+          type: string
+          format: date
+          example: '2023.04.09'
+        rating:
+          type: number
+          example: 5
+        author:
+          type: object
+          $ref: '#/components/schemas/user'
+    
+    createComment:
+      type: object
+      properties:
+        text:
+          type: string
+          example: 'Супер'
+        date:
+          type: string
+          format: date
+          example: '2023.04.09'
+        rating:
+          type: number
+          example: 5
+        authorId:
+          type: string
+          example: '6329c3d6a04ab1061c6425ea'
+    
+    setOfferFavorite:
+      type: object
+      properties:
+        isFavorite:
+          type: boolean
+          example: true
+        offerId:
+          type: string
+          example: '6329c3d6a04ab1061c6425ea'

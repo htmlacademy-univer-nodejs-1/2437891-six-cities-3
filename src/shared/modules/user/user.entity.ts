@@ -1,6 +1,7 @@
-import { defaultClasses, getModelForClass, prop, modelOptions } from '@typegoose/typegoose';
+import { defaultClasses, getModelForClass, prop, modelOptions, Ref } from '@typegoose/typegoose';
 import { User, UserType } from '../../types/user.js';
 import { createSHA256 } from '../../helpers/hash.js';
+import { OfferEntity } from '../rent-offer/rent-offer.entity.js';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export interface UserEntity extends defaultClasses.Base {}
@@ -10,31 +11,38 @@ export interface UserEntity extends defaultClasses.Base {}
     collection: 'users'
   }
 })
+
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export class UserEntity extends defaultClasses.TimeStamps implements User {
   @prop({ unique: true, required: true })
   public email: string;
 
-  @prop({ required: false, default: '' })
+  @prop({ required: false })
   public avatarPath?: string;
 
-  @prop({ required: true, default: '' })
+  @prop({ required: true })
   public name: string;
 
-  @prop({ required: true, default: '' })
-  public type?: UserType;
+  @prop({ required: true })
+  public type: UserType;
 
-  @prop({ required: true, default: '' })
+  @prop({
+    ref: OfferEntity,
+    required: true,
+    default: []
+  })
+  public favoriteOffers: Ref<OfferEntity>[];
+
+  @prop({ required: false })
   private password?: string;
 
-  // TODO: actualize model
   constructor(userData: User) {
     super();
 
     this.email = userData.email;
     this.avatarPath = userData.avatarPath;
     this.name = userData.name;
-    this.type = userData.type;
+    // this.type = userData.type; TODO: fix
   }
 
   public setPassword(password: string, salt: string) {

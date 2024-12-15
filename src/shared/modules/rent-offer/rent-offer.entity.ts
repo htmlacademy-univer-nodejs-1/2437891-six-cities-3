@@ -6,7 +6,6 @@ import { UserEntity } from '../user/user.entity.js';
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export interface OfferEntity extends defaultClasses.Base {}
 
-// TODO: actualize model
 @modelOptions({
   schemaOptions: {
     collection: 'offers',
@@ -121,13 +120,14 @@ export class OfferEntity extends defaultClasses.TimeStamps {
     ref: UserEntity,
     required: true,
   })
-  public userId!: Ref<UserEntity>;
+  public author: Ref<UserEntity>;
 
   @prop({
     type: Number,
     required: true,
+    default: 5
   })
-  public commentsCount = 0;
+  public commentsCount: number;
 
   @prop({
     required: true,

@@ -16,6 +16,11 @@ export class DefaultOfferService implements OfferService {
     @inject(Component.RentOfferModel) private readonly offerModel: types.ModelType<OfferEntity>
   ) {}
 
+  public async exists(documentId: string): Promise<boolean> {
+    const offer = await this.offerModel.findById(documentId).exec();
+    return offer !== null;
+  }
+
   public async update(dto: UpdateOfferDto): Promise<DocumentType<OfferEntity> | null> {
     return this.offerModel.findByIdAndUpdate(dto.id, dto, {new: true}).exec();
   }
@@ -49,5 +54,9 @@ export class DefaultOfferService implements OfferService {
 
   public async findById(offerId: string): Promise<DocumentType<OfferEntity> | null> {
     return this.offerModel.findById(offerId).exec();
+  }
+
+  public async incCommentCount(offerId: string): Promise<void> {
+    await this.offerModel.updateOne({id: offerId}, {$inc: {commentsCount: 1}}).exec();
   }
 }

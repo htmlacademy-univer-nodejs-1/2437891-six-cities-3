@@ -34,7 +34,6 @@ export class DefaultOfferService implements OfferService {
       .exec();
   }
 
-  // TODO: limit to const, isPremium - required and default = false
   public async findPremium(city: City): Promise<DocumentType<OfferEntity>[]> {
     return this.offerModel
       .find({city, isPremium: true})

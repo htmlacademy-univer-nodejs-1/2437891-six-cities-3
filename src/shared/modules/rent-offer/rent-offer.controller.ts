@@ -14,38 +14,62 @@ import { CreateOfferRequest } from './requests/create-offer-request.type.js';
 import { UpdateOfferRequest } from './requests/update-offer-request.type.js';
 import { OfferShortRdo } from './rdo/offer-short.rdo.js';
 import { City } from '../../types/rent-offer.js';
+import { ValidateDtoMiddleware } from '../../libs/rest/middleware/validate-dto.middleware.js';
+import { CreateOfferDto } from './dto/create-offer.dto.js';
+import { UpdateOfferDto } from './dto/update-offer.dto.js';
+import { ValidateObjectIdMiddleware } from '../../libs/rest/middleware/validate-objectid.middleware.js';
+import { DocumentExistsMiddleware } from '../../libs/rest/middleware/document-exists.middleware.js';
 
 @injectable()
 export class OfferController extends BaseController {
   constructor(
     @inject(Component.Logger) protected readonly logger: Logger,
-    @inject(Component.UserService) protected readonly offerService: OfferService,
+    @inject(Component.RentOfferService) protected readonly offerService: OfferService,
     @inject(Component.UserService) protected readonly userService: UserService,
   ) {
     super(logger);
 
     this.logger.info('Register routes for OfferController…');
 
-    this.addRoute({ path: '/', method: HttpMethod.Post, handler: this.create });
-    this.addRoute({ path: '/', method: HttpMethod.Put, handler: this.update });
-    this.addRoute({ path: '/', method: HttpMethod.Delete, handler: this.delete });
-    this.addRoute({ path: '/:id', method: HttpMethod.Get, handler: this.getById });
+    this.addRoute({
+      path: '/',
+      method: HttpMethod.Post,
+      handler: this.create,
+      middlewares: [new ValidateDtoMiddleware(CreateOfferDto)]
+    });
+    this.addRoute({
+      path: '/:id',
+      method: HttpMethod.Put,
+      handler: this.update,
+      middlewares: [
+        new ValidateObjectIdMiddleware('id'),
+        new ValidateDtoMiddleware(UpdateOfferDto),
+        new DocumentExistsMiddleware(this.offerService, 'Offer', 'id')
+      ]
+    });
+    this.addRoute({path: '/:id',
+      method: HttpMethod.Delete,
+      handler: this.delete,
+      middlewares: [
+        new DocumentExistsMiddleware(this.offerService, 'Offer', 'id')
+      ]
+    });
+    this.addRoute({
+      path: '/:id',
+      method: HttpMethod.Get,
+      handler: this.getById,
+      middlewares: [
+        new DocumentExistsMiddleware(this.offerService, 'Offer', 'id')
+      ]
+    });
+    this.addRoute({path: '/', method: HttpMethod.Get, handler: this.getAll});
+    this.addRoute({path: '/premium', method: HttpMethod.Get, handler: this.getPremium});
   }
 
   public async create(
     { body }: CreateOfferRequest,
     res: Response,
   ): Promise<void> {
-    const offer = await this.offerService.findById(body.id);
-
-    if (offer) {
-      throw new HttpError(
-        StatusCodes.CONFLICT,
-        `Offer with id «${body.id}» exists.`,
-        'OfferController'
-      );
-    }
-
     const result = await this.offerService.create(body);
     this.created(res, fillDTO(OfferRdo, result));
   }
@@ -112,7 +136,7 @@ export class OfferController extends BaseController {
       : 60;
     const offers = await this.offerService.findAll(count);
 
-    this.ok(res, offers.map((o) => fillDTO(OfferShortRdo, o)));
+    this.ok(res, fillDTO(OfferRdo, offers));
   }
 
   public async getPremium(
@@ -121,6 +145,6 @@ export class OfferController extends BaseController {
   ): Promise<void> {
     const offers = await this.offerService.findPremium(req.body.city as City);
 
-    this.ok(res, offers.map((o) => fillDTO(OfferShortRdo, o)));
+    this.ok(res, fillDTO(OfferShortRdo, offers));
   }
 }
